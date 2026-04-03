@@ -1,39 +1,43 @@
 package com.talha.zorfin.repo;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.talha.zorfin.dto.TransactionSearchRequest;
 import com.talha.zorfin.entity.Transaction;
-import com.talha.zorfin.enums.TransactionCategory;
-import com.talha.zorfin.enums.TransactionType;
 
 import jakarta.persistence.criteria.Predicate;
 
 public class TransactionSpecification {
 
-    public static Specification<Transaction> getFilteredTransactions(
-            TransactionType type, TransactionCategory category, Instant startDate, Instant endDate) {
+    public static Specification<Transaction> getFilteredTransactions(TransactionSearchRequest request) {
+
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-
-            if (type != null) {
-                predicates.add(criteriaBuilder.equal(root.get("type"), type));
+            if (request.title() != null && !request.title().isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.title() + "%"));
             }
-            if (category != null) {
-                predicates.add(criteriaBuilder.equal(root.get("category"), category));
+            if (request.type() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), request.type()));
             }
-            if (startDate != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDate));
+            if (request.category() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("category"), request.category()));
             }
-            if (endDate != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDate));
+            if (request.startDate() != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), request.startDate()));
             }
-
+            if (request.endDate() != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), request.endDate()));
+            }
+            if (request.minAmount() != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("amount"), request.minAmount()));
+            }
+            if (request.maxAmount() != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("amount"), request.maxAmount()));
+            }
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
-
 }

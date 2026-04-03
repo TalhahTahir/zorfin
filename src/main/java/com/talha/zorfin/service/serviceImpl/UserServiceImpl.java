@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.talha.zorfin.dto.UserDto;
@@ -12,6 +13,7 @@ import com.talha.zorfin.entity.User;
 import com.talha.zorfin.enums.UserRole;
 import com.talha.zorfin.enums.UserStatus;
 import com.talha.zorfin.repo.UserRepo;
+import com.talha.zorfin.repo.UserSpecification;
 import com.talha.zorfin.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,13 +39,6 @@ public class UserServiceImpl implements UserService {
         user.setCreatedAt(Instant.now());
         user = userRepo.save(user);
         return mapper.map(user, UserDto.class);
-    }
-
-    @Override
-    public List<UserDto> getAllUsers() {
-
-        List<User> users = userRepo.findAll();
-        return users.stream().map(user -> mapper.map(user, UserDto.class)).toList();
     }
 
     @Override
@@ -76,25 +71,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getUsersByRole(UserRole role) {
+    public List<UserDto> getUsers(String name, String email, UserRole role, UserStatus status) {
 
-        List<User> users = userRepo.findAllByRole(role);
-        return users.stream().map(u -> mapper.map(u, UserDto.class)).toList();
-
-    }
-
-    @Override
-    public List<UserDto> getUsersByStatus(UserStatus status) {
-
-        List<User> users = userRepo.findAllByStatus(status);
+        Specification<User> spec = UserSpecification.getFilteredUsers(name, email, role, status);
+        List<User> users = userRepo.findAll(spec);
         return users.stream().map(u -> mapper.map(u, UserDto.class)).toList();
     }
 
-    @Override
-    public List<UserDto> getUsersByRoleAndStatus(UserRole role, UserStatus status) {
-
-        List<User> users = userRepo.findAllByRoleAndStatus(role, status);
-        return users.stream().map(u -> mapper.map(u, UserDto.class)).toList();
-    }
 
 }

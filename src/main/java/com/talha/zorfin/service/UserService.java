@@ -12,7 +12,9 @@ public interface UserService {
     // Basic CRUD
     UserDto createUser(UserRegisterDto userDto);
 
-    List<UserDto> getAllUsers();
+    List<UserDto> getUsers(
+        String name, String email, UserRole role, UserStatus status
+    );
 
     UserDto getUserById(Long id);
 
@@ -20,10 +22,4 @@ public interface UserService {
 
     void deleteUser(Long id);
 
-    // Filter methods
-    List<UserDto> getUsersByRole(UserRole role);
-
-    List<UserDto> getUsersByStatus(UserStatus status);
-
-    List<UserDto> getUsersByRoleAndStatus(UserRole role, UserStatus status);
 }

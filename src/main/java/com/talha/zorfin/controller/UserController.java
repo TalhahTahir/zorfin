@@ -21,10 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 
-
-
-
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -36,41 +32,29 @@ public class UserController {
     public UserDto getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
+
+    @GetMapping
+    public List<UserDto> getUsers(
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) String email,
+        @RequestParam(required = false) UserRole role,
+        @RequestParam(required = false) UserStatus status
+    ) {
+        return userService.getUsers(name, email, role, status);
+    }
     
-    @PostMapping("register")
+    @PostMapping
     public UserDto registerUser(@RequestBody UserRegisterDto dto) {
         return userService.createUser(dto);
     }
     
-    @GetMapping("/all")
-    public List<UserDto> getAllUsers() {
-        return userService.getAllUsers();
-    }
-    
-    @PutMapping("update/{id}")
+    @PutMapping("/{id}")
     public UserDto updateUser(@PathVariable Long id, @RequestBody UserRegisterDto dto) {
         return userService.updateUser(id, dto);
     }
 
-    @DeleteMapping("delete/{id}")
+    @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) { 
         userService.deleteUser(id);
     }
-
-    @GetMapping("by-role/{role}")
-    public List<UserDto> getUsersByRole(@PathVariable UserRole role) {
-        return userService.getUsersByRole(role);
-    }
-
-    @GetMapping("by-status/{status}")
-    public List<UserDto> getUsersByStatus(@PathVariable UserStatus status) {
-        return userService.getUsersByStatus(status);
-    }
-
-    @GetMapping("by-role-and-status")
-    public List<UserDto> getUsersByRoleAndStatus(@RequestParam UserRole role, @RequestParam UserStatus status) {
-        return userService.getUsersByRoleAndStatus(role, status);
-        // http://localhost:8080/api/users/by-role-and-status?role=ADMIN&status=ACTIVE 
-    }
-    
 }

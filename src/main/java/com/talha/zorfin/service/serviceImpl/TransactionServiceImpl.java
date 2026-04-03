@@ -1,5 +1,6 @@
 package com.talha.zorfin.service.serviceImpl;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.talha.zorfin.dto.TransactionDto;
+import com.talha.zorfin.dto.TransactionSearchRequest;
 import com.talha.zorfin.entity.Transaction;
 import com.talha.zorfin.enums.TransactionCategory;
 import com.talha.zorfin.enums.TransactionType;
@@ -40,12 +42,6 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<TransactionDto> getAllTransactions() {
-        List<Transaction> transactions = transactionRepo.findAll();
-        return transactions.stream().map(t -> mapper.map(t, TransactionDto.class)).toList();
-    }
-
-    @Override
     public TransactionDto updateTransaction(Long id, TransactionDto transactionDto) {
         Transaction tx = transactionRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transaction not found with id: " + id));
@@ -63,11 +59,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<TransactionDto> getTransactions(TransactionType type, TransactionCategory category, Instant startDate,
-            Instant endDate) {
+    public List<TransactionDto> getTransactions(TransactionSearchRequest request) {
 
-        Specification<Transaction> spec = TransactionSpecification.getFilteredTransactions(
-            type, category, startDate, endDate);
+        Specification<Transaction> spec = TransactionSpecification.getFilteredTransactions(request);
         List<Transaction> transactions = transactionRepo.findAll(spec);
         return transactions.stream().map(t -> mapper.map(t, TransactionDto.class)).toList();
     }    
