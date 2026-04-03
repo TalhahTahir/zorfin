@@ -4,8 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.talha.zorfin.dto.UserDto;
 import com.talha.zorfin.dto.UserRegisterDto;
-import com.talha.zorfin.enums.UserRole;
-import com.talha.zorfin.enums.UserStatus;
+import com.talha.zorfin.dto.UserSearchRequest;
 import com.talha.zorfin.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
@@ -34,13 +32,8 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserDto> getUsers(
-        @RequestParam(required = false) String name,
-        @RequestParam(required = false) String email,
-        @RequestParam(required = false) UserRole role,
-        @RequestParam(required = false) UserStatus status
-    ) {
-        return userService.getUsers(name, email, role, status);
+    public List<UserDto> getUsers(UserSearchRequest request) {
+        return userService.getUsers(request);
     }
     
     @PostMapping

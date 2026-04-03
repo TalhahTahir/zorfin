@@ -5,34 +5,29 @@ import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.talha.zorfin.dto.UserSearchRequest;
 import com.talha.zorfin.entity.User;
-import com.talha.zorfin.enums.UserRole;
-import com.talha.zorfin.enums.UserStatus;
 
 import jakarta.persistence.criteria.Predicate;
 
 public class UserSpecification {
     
-    public static Specification<User> getFilteredUsers(
-            String name,
-            String email,
-            UserRole role,
-            UserStatus status) {
+    public static Specification<User> getFilteredUsers(UserSearchRequest request) {
 
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (name != null && !name.isEmpty()) {
-                predicates.add(criteriaBuilder.like(root.get("name"), "%" + name + "%"));                
+            if (request.name() != null && !request.name().isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.name() + "%"));                
             }
-            if (email != null && !email.isEmpty()) {
-                predicates.add(criteriaBuilder.like(root.get("email"), "%" + email + "%"));                
+            if (request.email() != null && !request.email().isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("email"), "%" + request.email() + "%"));                
             }
-            if (role != null) {
-                predicates.add(criteriaBuilder.equal(root.get("role"), role));
+            if (request.role() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("role"), request.role()));
             }
-            if (status != null) {
-                predicates.add(criteriaBuilder.equal(root.get("status"), status));
+            if (request.status() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), request.status()));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

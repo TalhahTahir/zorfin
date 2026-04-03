@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.talha.zorfin.dto.UserDto;
 import com.talha.zorfin.dto.UserRegisterDto;
+import com.talha.zorfin.dto.UserSearchRequest;
 import com.talha.zorfin.entity.User;
 import com.talha.zorfin.enums.UserRole;
 import com.talha.zorfin.enums.UserStatus;
@@ -71,9 +72,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getUsers(String name, String email, UserRole role, UserStatus status) {
+    public List<UserDto> getUsers(UserSearchRequest request) {
 
-        Specification<User> spec = UserSpecification.getFilteredUsers(name, email, role, status);
+        Specification<User> spec = UserSpecification.getFilteredUsers(request);
         List<User> users = userRepo.findAll(spec);
         return users.stream().map(u -> mapper.map(u, UserDto.class)).toList();
     }
