@@ -57,13 +57,13 @@ public class UserController {
         userService.deleteUser(id);
     }
 
-    @GetMapping("by-role")
-    public List<UserDto> getUsersByRole(@RequestParam UserRole role) {
+    @GetMapping("by-role/{role}")
+    public List<UserDto> getUsersByRole(@PathVariable UserRole role) {
         return userService.getUsersByRole(role);
     }
 
-    @GetMapping("by-status")
-    public List<UserDto> getUsersByStatus(@RequestParam UserStatus status) {
+    @GetMapping("by-status/{status}")
+    public List<UserDto> getUsersByStatus(@PathVariable UserStatus status) {
         return userService.getUsersByStatus(status);
     }
 

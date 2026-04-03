@@ -60,7 +60,7 @@ public class Transaction {
     @Column(nullable = false)
     private Instant createdAt;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Instant updatedAt;
 
     @Column(nullable = true)

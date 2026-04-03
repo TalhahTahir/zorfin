@@ -23,13 +23,17 @@ public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final ModelMapper mapper;
 
-
-
     @Override
     public UserDto createUser(UserRegisterDto userDto) {
 
         User user = mapper.map(userDto, User.class);
-        user.setStatus(UserStatus.ACTIVE);
+
+        if (userDto.getStatus().equals(UserStatus.INACTIVE)) {
+            user.setStatus(UserStatus.INACTIVE);
+        } else {
+            user.setStatus(UserStatus.ACTIVE);
+        }
+        
         user.setCreatedAt(Instant.now());
         user = userRepo.save(user);
         return mapper.map(user, UserDto.class);
@@ -37,7 +41,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAllUsers() {
-        
+
         List<User> users = userRepo.findAll();
         return users.stream().map(user -> mapper.map(user, UserDto.class)).toList();
     }
@@ -68,7 +72,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-            userRepo.delete(user);
+        userRepo.delete(user);
     }
 
     @Override
@@ -76,7 +80,7 @@ public class UserServiceImpl implements UserService {
 
         List<User> users = userRepo.findAllByRole(role);
         return users.stream().map(u -> mapper.map(u, UserDto.class)).toList();
-       
+
     }
 
     @Override
@@ -88,8 +92,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getUsersByRoleAndStatus(UserRole role, UserStatus status) {
+
         List<User> users = userRepo.findAllByRoleAndStatus(role, status);
         return users.stream().map(u -> mapper.map(u, UserDto.class)).toList();
     }
-    
+
 }
