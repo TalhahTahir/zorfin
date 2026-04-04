@@ -1,12 +1,14 @@
 package com.talha.zorfin.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.talha.zorfin.dto.TransactionDto;
 import com.talha.zorfin.dto.TransactionSearchRequest;
 import com.talha.zorfin.service.TransactionService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +29,8 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @PostMapping
-    public TransactionDto createTransaction(@RequestBody TransactionDto dto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public TransactionDto createTransaction(@Valid @RequestBody TransactionDto dto) {
         return transactionService.createTransaction(dto);
     }
 
@@ -41,11 +45,12 @@ public class TransactionController {
     }
 
     @PutMapping("/{id}")
-    public TransactionDto updateTransaction(@PathVariable Long id, @RequestBody TransactionDto dto) {
+    public TransactionDto updateTransaction(@PathVariable Long id, @Valid @RequestBody TransactionDto dto) {
         return transactionService.updateTransaction(id, dto);
     }
     
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTransaction(@PathVariable Long id) {
         transactionService.deleteTransaction(id);
     }

@@ -7,6 +7,7 @@ import com.talha.zorfin.dto.UserRegisterDto;
 import com.talha.zorfin.dto.UserSearchRequest;
 import com.talha.zorfin.service.UserService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -26,6 +27,11 @@ public class UserController {
     
     private final UserService userService;
 
+    @PostMapping
+    public UserDto registerUser(@Valid @RequestBody UserRegisterDto dto) {
+        return userService.createUser(dto);
+    }
+
     @GetMapping("{id}")
     public UserDto getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
@@ -36,13 +42,8 @@ public class UserController {
         return userService.getUsers(request);
     }
     
-    @PostMapping
-    public UserDto registerUser(@RequestBody UserRegisterDto dto) {
-        return userService.createUser(dto);
-    }
-    
     @PutMapping("/{id}")
-    public UserDto updateUser(@PathVariable Long id, @RequestBody UserRegisterDto dto) {
+    public UserDto updateUser(@PathVariable Long id, @Valid @RequestBody UserRegisterDto dto) {
         return userService.updateUser(id, dto);
     }
 

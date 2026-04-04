@@ -12,6 +12,8 @@ import com.talha.zorfin.dto.UserRegisterDto;
 import com.talha.zorfin.dto.UserSearchRequest;
 import com.talha.zorfin.entity.User;
 import com.talha.zorfin.enums.UserStatus;
+import com.talha.zorfin.exception.AlreadyExistsException;
+import com.talha.zorfin.exception.ResourceNotFoundException;
 import com.talha.zorfin.repo.UserRepo;
 import com.talha.zorfin.repo.UserSpecification;
 import com.talha.zorfin.service.UserService;
@@ -28,6 +30,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(UserRegisterDto userDto) {
 
+        if (userRepo.existsByEmail(userDto.getEmail())) {
+            throw new AlreadyExistsException("User already exists with email: " + userDto.getEmail());
+        }
+
         User user = mapper.map(userDto, User.class);
 
         if (userDto.getStatus().equals(UserStatus.INACTIVE)) {
@@ -35,7 +41,7 @@ public class UserServiceImpl implements UserService {
         } else {
             user.setStatus(UserStatus.ACTIVE);
         }
-        
+
         user.setCreatedAt(Instant.now());
         user = userRepo.save(user);
         return mapper.map(user, UserDto.class);
@@ -45,16 +51,28 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserById(Long id) {
 
         User user = userRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         return mapper.map(user, UserDto.class);
 
+    }
+
+    @Override
+    public List<UserDto> getUsers(UserSearchRequest request) {
+
+        Specification<User> spec = UserSpecification.getFilteredUsers(request);
+        List<User> users = userRepo.findAll(spec);
+        return users.stream().map(u -> mapper.map(u, UserDto.class)).toList();
     }
 
     @Override
     public UserDto updateUser(Long id, UserRegisterDto userDto) {
 
         User user = userRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        if (userRepo.existsByEmailAndIdNot(userDto.getEmail(), id)) {
+            throw new AlreadyExistsException("User already exists with email: " + userDto.getEmail());
+        }
 
         mapper.map(userDto, user);
         user.setUpdatedAt(Instant.now());
@@ -66,17 +84,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
 
         User user = userRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         userRepo.delete(user);
     }
-
-    @Override
-    public List<UserDto> getUsers(UserSearchRequest request) {
-
-        Specification<User> spec = UserSpecification.getFilteredUsers(request);
-        List<User> users = userRepo.findAll(spec);
-        return users.stream().map(u -> mapper.map(u, UserDto.class)).toList();
-    }
-
-
 }
