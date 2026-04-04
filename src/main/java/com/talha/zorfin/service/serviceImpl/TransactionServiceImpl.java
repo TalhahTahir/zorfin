@@ -1,6 +1,5 @@
 package com.talha.zorfin.service.serviceImpl;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
@@ -11,8 +10,6 @@ import org.springframework.stereotype.Service;
 import com.talha.zorfin.dto.TransactionDto;
 import com.talha.zorfin.dto.TransactionSearchRequest;
 import com.talha.zorfin.entity.Transaction;
-import com.talha.zorfin.enums.TransactionCategory;
-import com.talha.zorfin.enums.TransactionType;
 import com.talha.zorfin.repo.TransactionRepo;
 import com.talha.zorfin.repo.TransactionSpecification;
 import com.talha.zorfin.service.TransactionService;

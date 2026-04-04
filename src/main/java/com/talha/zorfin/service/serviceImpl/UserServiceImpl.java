@@ -11,7 +11,6 @@ import com.talha.zorfin.dto.UserDto;
 import com.talha.zorfin.dto.UserRegisterDto;
 import com.talha.zorfin.dto.UserSearchRequest;
 import com.talha.zorfin.entity.User;
-import com.talha.zorfin.enums.UserRole;
 import com.talha.zorfin.enums.UserStatus;
 import com.talha.zorfin.repo.UserRepo;
 import com.talha.zorfin.repo.UserSpecification;
