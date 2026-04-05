@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.talha.zorfin.dto.UserDto;
@@ -26,6 +27,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepo userRepo;
     private final ModelMapper mapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDto createUser(UserRegisterDto userDto) {
@@ -35,6 +37,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = mapper.map(userDto, User.class);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         if (userDto.getStatus().equals(UserStatus.INACTIVE)) {
             user.setStatus(UserStatus.INACTIVE);
@@ -75,6 +78,10 @@ public class UserServiceImpl implements UserService {
         }
 
         mapper.map(userDto, user);
+
+        if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        }
         user.setUpdatedAt(Instant.now());
         user = userRepo.save(user);
         return mapper.map(user, UserDto.class);
