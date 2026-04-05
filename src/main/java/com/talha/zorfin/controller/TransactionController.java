@@ -1,9 +1,11 @@
 package com.talha.zorfin.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.talha.zorfin.dto.PagedResponse;
 import com.talha.zorfin.dto.TransactionDto;
 import com.talha.zorfin.dto.TransactionSearchRequest;
 import com.talha.zorfin.service.TransactionService;
@@ -43,8 +45,13 @@ public class TransactionController {
     }
 
     @GetMapping
-    public List<TransactionDto> getTransactions(TransactionSearchRequest request) {
-        return transactionService.getTransactions(request);
+    public PagedResponse<TransactionDto> getTransactions(
+            TransactionSearchRequest request,
+            @RequestParam(value = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(value = "size", defaultValue = "10", required = false) int size,
+            @RequestParam(value = "sortBy", defaultValue = "createdAt", required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "desc", required = false) String sortDir) {
+        return transactionService.getTransactions(request, page, size, sortBy, sortDir);
     }
 
     @PreAuthorize("hasRole('ADMIN')") // Only ADMIN can update transactions

@@ -2,6 +2,7 @@ package com.talha.zorfin.service;
 
 import java.util.List;
 
+import com.talha.zorfin.dto.PagedResponse;
 import com.talha.zorfin.dto.TransactionDto;
 import com.talha.zorfin.dto.TransactionSearchRequest;
 
@@ -15,6 +16,11 @@ public interface TransactionService {
 
     void deleteTransaction(Long id);
 
-    List<TransactionDto> getTransactions(TransactionSearchRequest request);
+    PagedResponse<TransactionDto> getTransactions(
+        TransactionSearchRequest request,
+        int page,
+        int size,
+        String sortBy,
+        String sortDir);
 
 }

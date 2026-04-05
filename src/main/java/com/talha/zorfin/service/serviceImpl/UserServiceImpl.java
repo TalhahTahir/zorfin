@@ -4,10 +4,16 @@ import java.time.Instant;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
+
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.talha.zorfin.dto.PagedResponse;
 import com.talha.zorfin.dto.UserDto;
 import com.talha.zorfin.dto.UserRegisterDto;
 import com.talha.zorfin.dto.UserSearchRequest;
@@ -60,11 +66,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getUsers(UserSearchRequest request) {
+    public PagedResponse<UserDto> getUsers(UserSearchRequest request, int page, int size, String sortBy,
+            String sortDir) {
+
+        // Determining the sort direction
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         Specification<User> spec = UserSpecification.getFilteredUsers(request);
-        List<User> users = userRepo.findAll(spec);
-        return users.stream().map(u -> mapper.map(u, UserDto.class)).toList();
+        Page<User> userPage = userRepo.findAll(spec, pageable);
+        List<UserDto> content = userPage.getContent().stream()
+                .map(u -> mapper.map(u, UserDto.class))
+                .toList();
+                
+        return new PagedResponse<>(
+                content,
+                userPage.getNumber(),
+                userPage.getSize(),
+                userPage.getTotalElements(),
+                userPage.getTotalPages(),
+                userPage.isLast());
     }
 
     @Override

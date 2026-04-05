@@ -4,9 +4,14 @@ import java.time.Instant;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.talha.zorfin.dto.PagedResponse;
 import com.talha.zorfin.dto.TransactionDto;
 import com.talha.zorfin.dto.TransactionSearchRequest;
 import com.talha.zorfin.entity.Transaction;
@@ -40,11 +45,30 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<TransactionDto> getTransactions(TransactionSearchRequest request) {
+    public PagedResponse<TransactionDto> getTransactions(TransactionSearchRequest request, int page, int size, String sortBy, String sortDir) {
 
-        Specification<Transaction> spec = TransactionSpecification.getFilteredTransactions(request);
-        List<Transaction> transactions = transactionRepo.findAll(spec);
-        return transactions.stream().map(t -> mapper.map(t, TransactionDto.class)).toList();
+        // Determining the sort direction
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) 
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+Specification<Transaction> spec = TransactionSpecification.getFilteredTransactions(request);
+        Page<Transaction> transactionPage = transactionRepo.findAll(spec, pageable);
+
+        List<TransactionDto> content = transactionPage.getContent().stream()
+                .map(t -> mapper.map(t, TransactionDto.class))
+                .toList();
+
+        return new PagedResponse<>(
+                content,
+                transactionPage.getNumber(),
+                transactionPage.getSize(),
+                transactionPage.getTotalElements(),
+                transactionPage.getTotalPages(),
+                transactionPage.isLast()
+        );
     }
 
     @Override
