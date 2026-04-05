@@ -10,10 +10,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Pageable;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.talha.zorfin.dto.PagedResponse;
+import com.talha.zorfin.dto.RoleUpdateDto;
+import com.talha.zorfin.dto.StatusUpdateDto;
 import com.talha.zorfin.dto.UserDto;
 import com.talha.zorfin.dto.UserRegisterDto;
 import com.talha.zorfin.dto.UserSearchRequest;
@@ -81,7 +84,7 @@ public class UserServiceImpl implements UserService {
         List<UserDto> content = userPage.getContent().stream()
                 .map(u -> mapper.map(u, UserDto.class))
                 .toList();
-                
+
         return new PagedResponse<>(
                 content,
                 userPage.getNumber(),
@@ -117,5 +120,41 @@ public class UserServiceImpl implements UserService {
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         userRepo.delete(user);
+    }
+
+    @Override
+    public UserDto updateUserRole(Long id, RoleUpdateDto dto) {
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        // Prevent admins from modifying their own role
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (user.getEmail().equals(currentUserEmail)) {
+            throw new IllegalArgumentException("You cannot change your own role.");
+        }
+
+        user.setRole(dto.getRole());
+        user.setUpdatedAt(Instant.now());
+        user = userRepo.save(user);
+        
+        return mapper.map(user, UserDto.class);
+    }
+
+    @Override
+    public UserDto updateUserStatus(Long id, StatusUpdateDto dto) {
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        // Prevent admins from deactivating themselves
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (user.getEmail().equals(currentUserEmail) && dto.getStatus() == UserStatus.INACTIVE) {
+            throw new IllegalArgumentException("You cannot deactivate your own account.");
+        }
+
+        user.setStatus(dto.getStatus());
+        user.setUpdatedAt(Instant.now());
+        user = userRepo.save(user);
+        
+        return mapper.map(user, UserDto.class);
     }
 }

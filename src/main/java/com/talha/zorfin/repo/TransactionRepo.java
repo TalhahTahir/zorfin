@@ -21,7 +21,8 @@ public interface TransactionRepo extends JpaRepository<Transaction, Long>, JpaSp
             t.category, COUNT(t), SUM(t.amount), AVG(t.amount), MIN(t.amount), MAX(t.amount)
             )
             FROM Transaction t
-            WHERE t.createdAt >= :startDate AND t.createdAt <= :endDate
+            WHERE (:startDate IS NULL OR t.createdAt >= :startDate) 
+              AND (:endDate IS NULL OR t.createdAt <= :endDate)
             GROUP BY t.category
             """)
     List<CategoryStatsDto> getCategoryStats(@Param("startDate") Instant startDate, @Param("endDate") Instant endDate);
@@ -32,7 +33,8 @@ public interface TransactionRepo extends JpaRepository<Transaction, Long>, JpaSp
             t.type, COUNT(t), SUM(t.amount), AVG(t.amount), MIN(t.amount), MAX(t.amount)
             )
             FROM Transaction t
-            WHERE t.createdAt >= :startDate AND t.createdAt <= :endDate
+            WHERE (:startDate IS NULL OR t.createdAt >= :startDate) 
+              AND (:endDate IS NULL OR t.createdAt <= :endDate)
             GROUP BY t.type
             """)
     List<TypeStatsDto> getTypeStats(@Param("startDate") Instant startDate, @Param("endDate") Instant endDate);

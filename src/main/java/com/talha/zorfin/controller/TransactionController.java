@@ -10,10 +10,10 @@ import com.talha.zorfin.dto.TransactionDto;
 import com.talha.zorfin.dto.TransactionSearchRequest;
 import com.talha.zorfin.service.TransactionService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,16 +35,19 @@ public class TransactionController {
     @PreAuthorize("hasRole('ADMIN')") // Only ADMIN can create transactions
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create transaction", description = "Creates a new transaction entry.")
     public TransactionDto createTransaction(@Valid @RequestBody TransactionDto dto) {
         return transactionService.createTransaction(dto);
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get transaction by ID", description = "Fetches a transaction by its unique ID.")
     public TransactionDto gettransactionById(@PathVariable Long id) {
         return transactionService.getTransactionById(id);
     }
 
     @GetMapping
+    @Operation(summary = "List transactions", description = "Returns a paginated list of transactions with optional filters and sorting.")
     public PagedResponse<TransactionDto> getTransactions(
             TransactionSearchRequest request,
             @RequestParam(value = "page", defaultValue = "0", required = false) int page,
@@ -56,6 +59,7 @@ public class TransactionController {
 
     @PreAuthorize("hasRole('ADMIN')") // Only ADMIN can update transactions
     @PutMapping("/{id}")
+    @Operation(summary = "Update transaction", description = "Updates an existing transaction by ID.")
     public TransactionDto updateTransaction(@PathVariable Long id, @Valid @RequestBody TransactionDto dto) {
         return transactionService.updateTransaction(id, dto);
     }
@@ -63,6 +67,7 @@ public class TransactionController {
     @PreAuthorize("hasRole('ADMIN')") // Only ADMIN can delete transactions
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete transaction", description = "Deletes a transaction by ID.")
     public void deleteTransaction(@PathVariable Long id) {
         transactionService.deleteTransaction(id);
     }

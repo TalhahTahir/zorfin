@@ -12,6 +12,7 @@ import com.talha.zorfin.dto.LoginDto;
 import com.talha.zorfin.security.CustomUserDetailsService;
 import com.talha.zorfin.security.JwtService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,7 @@ public class AuthController {
     private final JwtService jwtService;
 
     @PostMapping("/login")
+    @Operation(summary = "User login", description = "Authenticates a user and returns a JWT token.")
     public ResponseEntity<AuthResponseDto> authenticateUser(@Valid @RequestBody LoginDto loginDto) {
 
         // 1. Authenticate the user (Checks password)
