@@ -1,5 +1,6 @@
 package com.talha.zorfin.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.talha.zorfin.dto.DashboardSummaryDto;
@@ -15,6 +16,7 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
 
+@PreAuthorize("hasAnyRole('USER', 'ANALYST', 'ADMIN')")
     @GetMapping
     public DashboardSummaryDto getSummary(
             @RequestParam (required = false) Instant startDate,

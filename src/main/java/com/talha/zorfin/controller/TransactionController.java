@@ -20,14 +20,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/transactions")
+@PreAuthorize("hasAnyRole('ANALYST', 'ADMIN')")
 public class TransactionController {
-    
+
     private final TransactionService transactionService;
 
+    @PreAuthorize("hasRole('ADMIN')") // Only ADMIN can create transactions
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TransactionDto createTransaction(@Valid @RequestBody TransactionDto dto) {
@@ -35,7 +38,7 @@ public class TransactionController {
     }
 
     @GetMapping("/{id}")
-    public TransactionDto gettransaction(@PathVariable Long id) {
+    public TransactionDto gettransactionById(@PathVariable Long id) {
         return transactionService.getTransactionById(id);
     }
 
@@ -44,15 +47,17 @@ public class TransactionController {
         return transactionService.getTransactions(request);
     }
 
+    @PreAuthorize("hasRole('ADMIN')") // Only ADMIN can update transactions
     @PutMapping("/{id}")
     public TransactionDto updateTransaction(@PathVariable Long id, @Valid @RequestBody TransactionDto dto) {
         return transactionService.updateTransaction(id, dto);
     }
-    
+
+    @PreAuthorize("hasRole('ADMIN')") // Only ADMIN can delete transactions
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTransaction(@PathVariable Long id) {
         transactionService.deleteTransaction(id);
     }
-    
+
 }
